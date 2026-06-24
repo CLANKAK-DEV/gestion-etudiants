@@ -9,7 +9,7 @@
     "install:frontend": "npm --prefix frontend install",
     "server": "npm --prefix server run dev",
     "frontend": "npm --prefix frontend start",
-    "build": "npm --prefix frontend run build"
+    "build": "npm --prefix frontend install && npm --prefix frontend run build"
   },
   "engines": {
     "node": ">=18"
