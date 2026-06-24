@@ -1,0 +1,124 @@
+// Bootstrap 5
+@import 'bootstrap/scss/bootstrap';
+
+// ── Google Font ───────────────────────────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+// ── CSS Variables ─────────────────────────────────────────────────────────────
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --text: #111827;
+  --text-muted: #6b7280;
+  // Render native controls (dropdowns, date pickers, scrollbars) in light mode.
+  color-scheme: light;
+}
+
+:root.dark {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --border: rgba(255,255,255,0.08);
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  // Render native <select> popups + date-picker calendars dark with readable text.
+  color-scheme: dark;
+}
+
+// ── Global Reset ──────────────────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.25s, color 0.25s;
+  margin: 0;
+}
+
+// ── Dark mode Bootstrap overrides ─────────────────────────────────────────────
+:root.dark {
+  .card {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+  }
+  .card-footer { border-top-color: var(--border); }
+  .table { color: var(--text); }
+  .table-light { background: rgba(255,255,255,0.04); color: var(--text); }
+  .table > :not(caption) > * > * { background: transparent; color: var(--text); border-bottom-color: var(--border); }
+  .table-hover > tbody > tr:hover > * { background: rgba(255,255,255,0.04); }
+  .form-control, .form-select {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--border);
+    color: var(--text);
+    &:focus { background: rgba(255,255,255,0.08); color: var(--text); }
+    &::placeholder { color: var(--text-muted); }
+  }
+  // Native <select> dropdown list: force dark background + light text
+  // (color-scheme alone is unreliable across browsers).
+  .form-select option,
+  .form-select optgroup,
+  option {
+    background-color: #1a1d27;
+    color: #f1f5f9;
+  }
+  // Pagination: inactive buttons were white in dark mode.
+  .page-link {
+    background-color: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+    &:hover { background-color: rgba(255,255,255,0.06); color: var(--text); }
+  }
+  .page-item.active .page-link {
+    background-color: #6366f1;
+    border-color: #6366f1;
+    color: #fff;
+  }
+  .page-item.disabled .page-link {
+    background-color: var(--surface);
+    border-color: var(--border);
+    color: var(--text-muted);
+  }
+  .modal-content { background: var(--surface); color: var(--text); }
+  .dropdown-menu { background: var(--surface); border-color: var(--border); }
+  .dropdown-item { color: var(--text); &:hover { background: rgba(255,255,255,0.06); } }
+  // Keep outline buttons (Export, Reset) clearly readable — not greyed out.
+  .btn-outline-secondary {
+    color: var(--text);
+    border-color: var(--border);
+    &:hover, &:focus { background: rgba(255,255,255,0.08); color: var(--text); border-color: rgba(255,255,255,0.2); }
+  }
+  .text-muted { color: var(--text-muted) !important; }
+  .border-top { border-color: var(--border) !important; }
+}
+
+// ── Scrollbar ─────────────────────────────────────────────────────────────────
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.3); border-radius: 3px; }
+
+// ── Transitions ───────────────────────────────────────────────────────────────
+.card { transition: box-shadow 0.15s; }
+
+// ── Table ─────────────────────────────────────────────────────────────────────
+code.text-primary { font-size: 0.78rem; }
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+.page-link { cursor: pointer; }
+
+// ── Badge text wrapping ───────────────────────────────────────────────────────
+.badge { white-space: normal; text-align: center; font-size: 0.72rem; }
+
+// ── Custom badge colours (not in Bootstrap by default) ────────────────────────
+.bg-pink   { background-color: #ec4899 !important; color: #fff !important; }
+.bg-orange { background-color: #f97316 !important; color: #1e293b !important; }
+.bg-purple { background-color: #a855f7 !important; color: #fff !important; }
+
+// ── App icons (real images in assets/icons) ───────────────────────────────────
+.app-icon {
+  object-fit: contain;
+  vertical-align: -0.18em;
+}
+.app-icon-sm { width: 18px;  height: 18px; }   // buttons, menu items, table actions
+.app-icon-lg { width: 56px;  height: 56px; }   // empty / error states

@@ -1,0 +1,222 @@
+<!-- Page Header -->
+<div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-2">
+  <div>
+    <h1 class="h3 fw-bold mb-0">Students</h1>
+    <p class="text-muted small mb-0">Browse, search, filter and manage all student records.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <div class="dropdown">
+      <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button"
+              [class.show]="exportOpen" (click)="toggleExport($event)">
+        Export
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" [class.show]="exportOpen"
+          style="position:absolute; top:100%; right:0; left:auto; margin-top:.25rem; min-width:11rem;">
+        <li><button class="dropdown-item" type="button" (click)="exportPdf()"><img src="assets/icons/export-pdf.png" alt="" class="app-icon app-icon-sm me-2">Export PDF</button></li>
+        <li><button class="dropdown-item" type="button" (click)="exportExcel()"><img src="assets/icons/export-excel.png" alt="" class="app-icon app-icon-sm me-2">Export Excel</button></li>
+      </ul>
+    </div>
+    <a routerLink="/students/new" class="btn btn-primary btn-sm"><img src="assets/icons/add.png" alt="" class="app-icon app-icon-sm me-1">Add Student</a>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small mb-1">Total Students</div>
+        <div class="fw-bold fs-4 text-primary">
+          {{ statsLoading ? '—' : (stats?.total ?? meta.total) }}
+        </div>
+        <div class="text-muted" style="font-size:11px">All registered</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small mb-1">New This Month</div>
+        <div class="fw-bold fs-4 text-success">{{ statsLoading ? '—' : (stats?.newThisMonth ?? 0) }}</div>
+        <div class="text-muted" style="font-size:11px">Added since the 1st</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small mb-1">Last 30 Days</div>
+        <div class="fw-bold fs-4 text-warning">{{ statsLoading ? '—' : (stats?.newLast30Days ?? 0) }}</div>
+        <div class="text-muted" style="font-size:11px">Recently enrolled</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="text-muted small mb-1">Active Filières</div>
+        <div class="fw-bold fs-4 text-info">{{ statsLoading ? '—' : (stats?.filiereCount ?? 0) }}</div>
+        <div class="text-muted" style="font-size:11px">Programs with students</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card border-0 shadow-sm mb-3">
+  <div class="card-body">
+    <div class="row g-2">
+      <div class="col-12 col-md-4">
+        <input type="text" class="form-control form-control-sm" placeholder="Search name, email, matricule…"
+               [(ngModel)]="search" (input)="onSearchInput()">
+      </div>
+      <div class="col-6 col-md-2">
+        <select class="form-select form-select-sm" [(ngModel)]="filiere" (change)="applyFilter()">
+          <option value="">All Filières</option>
+          <option *ngFor="let f of FILIERES" [value]="f">{{ f }}</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <input type="text" class="form-control form-control-sm" placeholder="City"
+               [(ngModel)]="ville" (input)="applyFilter()">
+      </div>
+      <div class="col-6 col-md-1">
+        <input type="date" class="form-control form-control-sm" [(ngModel)]="dateFrom" (change)="applyFilter()">
+      </div>
+      <div class="col-6 col-md-1">
+        <input type="date" class="form-control form-control-sm" [(ngModel)]="dateTo" (change)="applyFilter()">
+      </div>
+      <div class="col-6 col-md-1">
+        <select class="form-select form-select-sm" [(ngModel)]="sortBy" (change)="applyFilter()">
+          <option *ngFor="let f of SORTABLE_FIELDS" [value]="f.value">{{ f.label }}</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-1">
+        <button class="btn btn-outline-secondary btn-sm w-100" (click)="resetFilters()" title="Reset filters">
+          <img src="assets/icons/reset.png" alt="" class="app-icon app-icon-sm me-1">Reset
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table Card -->
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+
+    <!-- Error state -->
+    <div *ngIf="error" class="text-center py-5 text-danger">
+      <div class="mb-2"><img src="assets/icons/warning.png" alt="" class="app-icon app-icon-lg"></div>
+      <p class="mb-2">{{ error }}</p>
+      <button class="btn btn-outline-danger btn-sm" (click)="loadStudents()">Try again</button>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div *ngIf="loading && !error" class="p-4">
+      <div *ngFor="let i of [1,2,3,4,5]" class="placeholder-glow mb-2">
+        <span class="placeholder col-12" style="height:32px;border-radius:6px"></span>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && !error && students.length === 0" class="text-center py-5 text-muted">
+      <div class="mb-2"><img src="assets/icons/empty.png" alt="" class="app-icon app-icon-lg"></div>
+      <p class="mb-2">No students found.</p>
+      <a routerLink="/students/new" class="btn btn-primary btn-sm"><img src="assets/icons/add.png" alt="" class="app-icon app-icon-sm me-1">Add Student</a>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!loading && !error && students.length > 0" class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Matricule</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Filière</th>
+            <th class="d-none d-md-table-cell">City</th>
+            <th class="d-none d-md-table-cell">Age</th>
+            <th class="d-none d-lg-table-cell">Phone</th>
+            <th class="d-none d-lg-table-cell">Added</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of students">
+            <td><code class="text-primary small">{{ s.matricule }}</code></td>
+            <td>
+              <div class="fw-semibold">{{ s.nom }} {{ s.prenom }}</div>
+            </td>
+            <td><span class="text-muted small">{{ s.email }}</span></td>
+            <td>
+              <span class="badge rounded-pill" [ngClass]="'bg-' + filiereColor(s.filiere)">
+                {{ s.filiere }}
+              </span>
+            </td>
+            <td class="d-none d-md-table-cell text-muted small">{{ s.ville }}</td>
+            <td class="d-none d-md-table-cell text-muted small">{{ calcAge(s.date_naissance) }} yrs</td>
+            <td class="d-none d-lg-table-cell text-muted small">{{ s.telephone }}</td>
+            <td class="d-none d-lg-table-cell text-muted small">
+              {{ s.created_at | date:'dd/MM/yyyy' }}
+            </td>
+            <td class="text-end">
+              <div class="d-flex gap-1 justify-content-end">
+                <a [routerLink]="['/students', s.id, 'edit']" class="btn btn-sm btn-outline-primary" title="Edit"><img src="assets/icons/edit.png" alt="Edit" class="app-icon app-icon-sm"></a>
+                <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(s)" title="Delete"><img src="assets/icons/delete.png" alt="Delete" class="app-icon app-icon-sm"></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination footer -->
+  <div *ngIf="!loading && students.length > 0"
+       class="card-footer d-flex flex-wrap align-items-center justify-content-between gap-2 bg-transparent border-top-0 px-3 py-2">
+    <div class="d-flex align-items-center gap-2 small text-muted">
+      Rows per page:
+      <select class="form-select form-select-sm w-auto" [(ngModel)]="limit" (change)="onLimitChange(+limit)">
+        <option *ngFor="let o of PAGE_SIZE_OPTIONS" [value]="o">{{ o }}</option>
+      </select>
+      <span>{{ (meta.page-1)*meta.limit+1 }}–{{ minOf(meta.page*meta.limit, meta.total) }} of {{ meta.total }}</span>
+    </div>
+    <nav>
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="meta.page===1">
+          <button class="page-link" (click)="onPageChange(meta.page-1)">‹</button>
+        </li>
+        <li *ngFor="let p of pages" class="page-item" [class.active]="p===meta.page">
+          <button class="page-link" (click)="onPageChange(p)">{{ p }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="meta.page===meta.totalPages">
+          <button class="page-link" (click)="onPageChange(meta.page+1)">›</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div *ngIf="showDeleteModal" class="modal d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-danger"><img src="assets/icons/warning.png" alt="" class="app-icon app-icon-sm me-1">Delete Student</h5>
+        <button type="button" class="btn-close" (click)="cancelDelete()"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete
+        <strong>{{ studentToDelete?.prenom }} {{ studentToDelete?.nom }}</strong>?
+        This action cannot be undone.
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-outline-secondary" (click)="cancelDelete()">Cancel</button>
+        <button class="btn btn-danger" (click)="doDelete()" [disabled]="deleting">
+          <span *ngIf="deleting" class="spinner-border spinner-border-sm me-1"></span>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

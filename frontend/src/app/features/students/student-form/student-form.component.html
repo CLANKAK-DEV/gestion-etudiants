@@ -1,0 +1,126 @@
+<!-- Loading student (edit mode) -->
+<div *ngIf="fetchingStudent" class="text-center py-5">
+  <div class="spinner-border text-primary"></div>
+  <p class="text-muted mt-2">Loading student…</p>
+</div>
+
+<div *ngIf="!fetchingStudent">
+  <!-- Header -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a routerLink="/students" class="btn btn-sm btn-outline-secondary">← Back</a>
+    <div>
+      <h1 class="h3 fw-bold mb-0">{{ isEdit ? 'Edit Student' : 'Add Student' }}</h1>
+      <p class="text-muted small mb-0">{{ isEdit ? 'Update the student record below.' : 'Fill in the form to register a new student.' }}</p>
+    </div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="row g-3">
+
+          <!-- Matricule -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Matricule <span class="text-danger">*</span></label>
+            <input formControlName="matricule" type="text" class="form-control"
+                   [class.is-invalid]="invalid('matricule')" placeholder="e.g. ET-2024-001">
+            <div class="invalid-feedback">
+              <ng-container *ngIf="f('matricule').errors?.['required']">Matricule is required.</ng-container>
+              <ng-container *ngIf="f('matricule').errors?.['minlength']">Minimum 3 characters.</ng-container>
+              <ng-container *ngIf="f('matricule').errors?.['pattern']">Letters, numbers and dashes only.</ng-container>
+              <ng-container *ngIf="f('matricule').errors?.['server']">{{ f('matricule').errors?.['server'] }}</ng-container>
+            </div>
+          </div>
+
+          <!-- Last Name -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Last Name <span class="text-danger">*</span></label>
+            <input formControlName="nom" type="text" class="form-control"
+                   [class.is-invalid]="invalid('nom')" placeholder="Doe">
+            <div class="invalid-feedback">
+              <ng-container *ngIf="f('nom').errors?.['required']">Last name is required.</ng-container>
+              <ng-container *ngIf="f('nom').errors?.['server']">{{ f('nom').errors?.['server'] }}</ng-container>
+            </div>
+          </div>
+
+          <!-- First Name -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">First Name <span class="text-danger">*</span></label>
+            <input formControlName="prenom" type="text" class="form-control"
+                   [class.is-invalid]="invalid('prenom')" placeholder="John">
+            <div class="invalid-feedback">
+              <ng-container *ngIf="f('prenom').errors?.['required']">First name is required.</ng-container>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+            <input formControlName="email" type="email" class="form-control"
+                   [class.is-invalid]="invalid('email')" placeholder="john@example.com">
+            <div class="invalid-feedback">
+              <ng-container *ngIf="f('email').errors?.['required']">Email is required.</ng-container>
+              <ng-container *ngIf="f('email').errors?.['email']">Enter a valid email address.</ng-container>
+              <ng-container *ngIf="f('email').errors?.['server']">{{ f('email').errors?.['server'] }}</ng-container>
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Phone <span class="text-danger">*</span></label>
+            <input formControlName="telephone" type="tel" class="form-control"
+                   [class.is-invalid]="invalid('telephone')" placeholder="+213 555 123456">
+            <div class="invalid-feedback">
+              <ng-container *ngIf="f('telephone').errors?.['required']">Phone is required.</ng-container>
+            </div>
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Date of Birth <span class="text-danger">*</span></label>
+            <input formControlName="date_naissance" type="date" class="form-control"
+                   [class.is-invalid]="invalid('date_naissance')">
+            <div class="invalid-feedback">Date of birth is required.</div>
+          </div>
+
+          <!-- Filière -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Filière <span class="text-danger">*</span></label>
+            <select formControlName="filiere" class="form-select" [class.is-invalid]="invalid('filiere')">
+              <option value="">Select a program…</option>
+              <option *ngFor="let f of FILIERES" [value]="f">{{ f }}</option>
+            </select>
+            <div class="invalid-feedback">Please select a filière.</div>
+          </div>
+
+          <!-- City -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">City <span class="text-danger">*</span></label>
+            <input formControlName="ville" type="text" class="form-control"
+                   [class.is-invalid]="invalid('ville')" placeholder="Algiers">
+            <div class="invalid-feedback">City is required.</div>
+          </div>
+
+          <!-- Address (optional) -->
+          <div class="col-12">
+            <label class="form-label fw-semibold">Address <span class="text-muted small">(optional)</span></label>
+            <input formControlName="adresse" type="text" class="form-control"
+                   [class.is-invalid]="invalid('adresse')" placeholder="123 Main Street…">
+          </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-2 mt-4 pt-3 border-top">
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isEdit ? 'Save Changes' : 'Add Student' }}
+          </button>
+          <a routerLink="/students" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

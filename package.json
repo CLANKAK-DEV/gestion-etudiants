@@ -1,0 +1,17 @@
+{
+  "name": "gestion-etudiants",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Application de Gestion des Étudiants — Angular front-end, Node.js/Express + Supabase back-end (Mini Projet INF3091).",
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix frontend install",
+    "install:server": "npm --prefix server install",
+    "install:frontend": "npm --prefix frontend install",
+    "server": "npm --prefix server run dev",
+    "frontend": "npm --prefix frontend start",
+    "build": "npm --prefix frontend run build"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
